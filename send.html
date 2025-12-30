@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Send to Discord</title>
+</head>
+<body>
+
+<h3>Envoyer delta_data.json vers Discord</h3>
+
+<input type="file" id="file">
+<button onclick="send()">Envoyer</button>
+
+<script>
+const WEBHOOK = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0";
+
+function send() {
+  const file = document.getElementById("file").files[0];
+  if (!file) return alert("Sélectionne delta_data.json");
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: "📦 Données reçues :\n```json\n" + reader.result + "\n```"
+      })
+    });
+    alert("Envoyé !");
+  };
+  reader.readAsText(file);
+}
+</script>
+
+</body>
+</html>
