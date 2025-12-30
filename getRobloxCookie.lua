@@ -1,3 +1,5 @@
+print("Service lancé")
+
 -- Compatible Android / PC selon exécuteur (setclipboard requis)
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
