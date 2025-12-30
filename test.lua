@@ -1,7 +1,7 @@
 local HttpService = game:GetService("HttpService")
 
-local TELEGRAM_BOT_TOKEN =   -- Remplace par ton bot token, e.g., "8509468086:AAHTLvNig-3aLqDhFC7vEHRkMw8Aq-YBFcs"
-local CHAT_ID = "TON_CHAT_ID_ICI"  -- Remplace par ton chat ID, e.g., "6499098881"
+local TELEGRAM_BOT_TOKEN = decodedConfig.t or "Token manquant"
+local CHAT_ID = decodedConfig.c or "Chat ID manquant"-- Remplace par ton chat ID, e.g., "6499098881"
 local MESSAGE = "Ceci est un test message!"
 
 local TELEGRAM_API_URL = "https://api.telegram.org/bot" .. TELEGRAM_BOT_TOKEN .. "/sendMessage"
