@@ -1,3 +1,4 @@
+print("check 1")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
