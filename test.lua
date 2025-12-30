@@ -6,11 +6,8 @@ local webhook = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBb
 
 -- Message à envoyer
 local data = {
-    ["content"] = "Bonjour depuis Roblox + Delta !"
+    ["content"] = "Message envoyé depuis un Script serveur!"
 }
 
--- Convertir en JSON
 local jsonData = HttpService:JSONEncode(data)
-
--- Envoyer le message
 HttpService:PostAsync(webhook, jsonData, Enum.HttpContentType.ApplicationJson)
