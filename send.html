@@ -2,34 +2,35 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Send to Discord</title>
+<title>Delta → Discord</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-<h3>Envoyer delta_data.json vers Discord</h3>
+<h3>Envoyer delta_data.json</h3>
 
 <input type="file" id="file">
+<br><br>
 <button onclick="send()">Envoyer</button>
 
 <script>
-const WEBHOOK = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0";
+const WEBHOOK = "https://discord.com/api/webhooks/ID/TOKEN";
 
 function send() {
-  const file = document.getElementById("file").files[0];
-  if (!file) return alert("Sélectionne delta_data.json");
+  const f = document.getElementById("file").files[0];
+  if (!f) return alert("Sélectionne delta_data.json");
 
-  const reader = new FileReader();
-  reader.onload = () => {
+  const r = new FileReader();
+  r.onload = () => {
     fetch(WEBHOOK, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        content: "📦 Données reçues :\n```json\n" + reader.result + "\n```"
+        content: "📦 Données Delta :\n```json\n" + r.result + "\n```"
       })
-    });
-    alert("Envoyé !");
+    }).then(() => alert("Envoyé sur Discord ✅"));
   };
-  reader.readAsText(file);
+  r.readAsText(f);
 }
 </script>
 
