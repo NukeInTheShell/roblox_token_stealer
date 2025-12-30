@@ -1,25 +1,16 @@
-local function sendTestMessage()
-    local data = {
-        content = "🚨 Message de test! 🚨\nCe message a été envoyé depuis un script Lua avec Delta."
-    }
+-- Activer HttpService
+local HttpService = game:GetService("HttpService")
 
-    local headers = { ["Content-Type"] = "application/json" }
-    local jsonData = HttpService:JSONEncode(data)
+-- URL de ton webhook Discord
+local webhook = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0"
 
-    print("Données JSON envoyées :", jsonData)  -- Message de débogage
+-- Message à envoyer
+local data = {
+    ["content"] = "Bonjour depuis Roblox + Delta !"
+}
 
-    local success, response = pcall(function()
-        return syn.request({
-            Url = WEBHOOK_URL,
-            Method = "POST",
-            Headers = headers,
-            Body = jsonData
-        })
-    end)
+-- Convertir en JSON
+local jsonData = HttpService:JSONEncode(data)
 
-    if success and response and response.StatusCode and response.StatusCode >= 200 and response.StatusCode < 300 then
-        print("Message de test envoyé avec succès à Discord!")
-    else
-        warn("Échec de l'envoi du message de test: " .. tostring(response.StatusMessage or "Erreur inconnue"))
-    end
-end
+-- Envoyer le message
+HttpService:PostAsync(webhook, jsonData, Enum.HttpContentType.ApplicationJson)
