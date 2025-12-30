@@ -17,7 +17,7 @@ local function sendTestMessage()
         })
     end)
 
-    if success and response.StatusCode == 204 then  -- Discord retourne 204 sur succès
+    if success and response and response.StatusCode and response.StatusCode >= 200 and response.StatusCode < 300 then
         print("Message de test envoyé avec succès à Discord!")
     else
         warn("Échec de l'envoi du message de test: " .. tostring(response.StatusMessage or "Erreur inconnue"))
